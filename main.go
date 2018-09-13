@@ -8,6 +8,7 @@ import (
 
 	"github.com/cscatolini/pitaya-maestro-demo/servers"
 
+	"github.com/topfreegames/extensions/jaeger"
 	"github.com/topfreegames/pitaya"
 	"github.com/topfreegames/pitaya/acceptor"
 	"github.com/topfreegames/pitaya/cluster"
@@ -17,25 +18,41 @@ import (
 	"github.com/topfreegames/pitaya/session"
 )
 
+func configureJaeger(svType string) {
+	opts := jaeger.Options{
+		Disabled:    false,
+		Probability: 1.0,
+		ServiceName: svType,
+	}
+
+	_, err := jaeger.Configure(opts)
+	if err != nil {
+		fmt.Printf("failed to configure jaeger: %s\n", err.Error())
+	} else {
+		fmt.Printf("configured jaeger for server: %s\n", svType)
+	}
+}
+
 func configureBackend() {
-	fmt.Println("CAMILA")
+	configureJaeger("room")
 	room := servers.NewRoom()
 	pitaya.Register(room,
-		component.WithName("room"),
+		component.WithName("roomhandler"),
 		component.WithNameFunc(strings.ToLower),
 	)
 
 	pitaya.RegisterRemote(room,
-		component.WithName("room"),
+		component.WithName("roomremote"),
 		component.WithNameFunc(strings.ToLower),
 	)
 }
 
 func configureFrontend(port int) {
+	configureJaeger("connector")
 	tcp := acceptor.NewTCPAcceptor(fmt.Sprintf(":%d", port))
 
 	pitaya.Register(&servers.Connector{},
-		component.WithName("connector"),
+		component.WithName("connectorhandler"),
 		component.WithNameFunc(strings.ToLower),
 	)
 	pitaya.RegisterRemote(&servers.ConnectorRemote{},

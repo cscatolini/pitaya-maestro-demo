@@ -9,10 +9,22 @@ services:
     ports:
       - 2379:2379
   pitaya-admin:
-    image: tfgco/pitaya-admin:5435941
+    image: tfgco/pitaya-admin:16-a61c459
     ports:
       - 8000:8000
     environment:
       - PITAYA_CLUSTER_RPC_CLIENT_NATS_CONNECT=nats://nats:4222
       - PITAYA_CLUSTER_RPC_SERVER_NATS_CONNECT=nats://nats:4222
       - PITAYA_CLUSTER_SD_ETCD_ENDPOINTS=etcd:2379
+  jaeger:
+    image: jaegertracing/all-in-one:latest
+    ports:
+      - 5775:5775/udp
+      - 6831:6831/udp
+      - 6832:6832/udp
+      - 5778:5778
+      - 16686:16686
+      - 14268:14268
+      - 9411:9411
+    environment:
+      - COLLECTOR_ZIPKIN_HTTP_PORT=9411

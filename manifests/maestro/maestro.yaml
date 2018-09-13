@@ -1,0 +1,114 @@
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  labels:
+    app: maestro-api
+  name: maestro-api
+  namespace: default
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: maestro-api
+  template:
+    metadata:
+      labels:
+        app: maestro-api
+    spec:
+      containers:
+      - command:
+        - /app/maestro
+        - start
+        - -v3
+        - -p
+        - "80"
+        - --incluster
+        env:
+        - name: PGPASSWORD
+          value: ""
+        - name: MAESTRO_EXTENSIONS_PG_HOST
+          value: postgres.default.svc.cluster.local
+        - name: MAESTRO_EXTENSIONS_PG_PORT
+          value: "5432"
+        - name: MAESTRO_EXTENSIONS_PG_USER
+          value: maestro
+        - name: MAESTRO_EXTENSIONS_PG_PASS
+          value: ""
+        - name: MAESTRO_ENVIRONMENT
+          value: "development"
+        - name: MAESTRO_EXTENSIONS_PG_DATABASE
+          value: maestro
+        - name: MAESTRO_EXTENSIONS_REDIS_URL
+          value: redis://:@redis.default.svc.cluster.local:6379
+        - name: MAESTRO_OAUTH_ENABLED
+          value: "false"
+        image: quay.io/tfgco/maestro:v6.0.1
+        name: maestro-api
+        ports:
+        - containerPort: 80
+          protocol: TCP
+---
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  labels:
+    app: maestro-worker
+  name: maestro-worker
+  namespace: default
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: maestro-worker
+  template:
+    metadata:
+      labels:
+        app: maestro-worker
+    spec:
+      containers:
+      - command:
+        - /app/maestro
+        - worker
+        - -v3
+        - --incluster
+        env:
+        - name: PGPASSWORD
+          value: ""
+        - name: MAESTRO_EXTENSIONS_PG_HOST
+          value: postgres.default.svc.cluster.local
+        - name: MAESTRO_EXTENSIONS_PG_PORT
+          value: "5432"
+        - name: MAESTRO_EXTENSIONS_PG_USER
+          value: maestro
+        - name: MAESTRO_EXTENSIONS_PG_PASS
+          value: ""
+        - name: MAESTRO_ENVIRONMENT
+          value: "development"
+        - name: MAESTRO_EXTENSIONS_PG_DATABASE
+          value: maestro
+        - name: MAESTRO_EXTENSIONS_REDIS_URL
+          value: redis://:@redis.default.svc.cluster.local:6379
+        - name: MAESTRO_EXTENSIONS_PG_DATABASE
+          value: maestro
+        - name: MAESTRO_EXTENSIONS_REDIS_URL
+          value: redis://:@redis.default.svc.cluster.local:6379
+        - name: MAESTRO_OAUTH_ENABLED
+          value: "false"
+        image: quay.io/tfgco/maestro:v6.0.1
+        name: maestro-worker
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app: maestro-api
+  name: maestro-api
+  namespace: default
+spec:
+  ports:
+  - port: 80
+    protocol: TCP
+    targetPort: 80
+  selector:
+    app: maestro-api
+  type: NodePort

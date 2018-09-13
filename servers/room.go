@@ -100,9 +100,13 @@ func (r *Room) Entry(ctx context.Context, uid []byte) (*JoinResponse, error) {
 
 // GetSessionData gets the session data
 func (r *Room) GetSessionData(ctx context.Context) (*SessionData, error) {
+	time.Sleep(2 * time.Second)
 	s := pitaya.GetSessionFromCtx(ctx)
+	sv := pitaya.GetServer()
+	msg := fmt.Sprintf("ServerID: %s, Type: %s", sv.ID, sv.Type)
 	return &SessionData{
 		Data: s.GetData(),
+		Msg:  msg,
 	}, nil
 }
 

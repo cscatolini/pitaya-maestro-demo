@@ -1,0 +1,32 @@
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  labels:
+    app: pitaya-room
+  name: pitaya-room
+  namespace: default
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: pitaya-room
+  template:
+    metadata:
+      labels:
+        app: pitaya-room
+    spec:
+      containers:
+      - command:
+        - ./main
+        - -frontend=false
+        - -type=room
+        image: cscatolini/pitaya-maestro-demo:963179a
+        imagePullPolicy: IfNotPresent
+        name: pitaya-room
+        env:
+        - name: PITAYA_CLUSTER_RPC_CLIENT_NATS_CONNECT
+          value: nats://nats.default.svc.cluster.local:4222
+        - name: PITAYA_CLUSTER_RPC_SERVER_NATS_CONNECT
+          value: nats://nats.default.svc.cluster.local:4222
+        - name: PITAYA_CLUSTER_SD_ETCD_ENDPOINTS
+          value: etcd.default.svc.cluster.local:2379

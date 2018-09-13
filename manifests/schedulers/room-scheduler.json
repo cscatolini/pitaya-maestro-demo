@@ -1,0 +1,38 @@
+{
+  "name": "pitaya-room-scheduler",
+  "game": "pitaya-example",
+  "occupiedTimeout": 180,
+  "shutdownTimeout": 100,
+  "autoscaling": {
+    "min": 2,
+    "up": {
+      "cooldown": 10,
+      "delta": 1,
+      "trigger": {
+        "usage": 80,
+        "time": 20
+      }
+    },
+    "down": {
+      "cooldown": 30,
+      "delta": 1,
+      "trigger": {
+        "usage": 50,
+        "time": 20
+      }
+    }
+  },
+  "containers": [
+    {
+      "name": "room",
+      "image": "cscatolini/pitaya-maestro-demo:963179a",
+      "ports": [
+        {
+          "containerPort": 3250,
+          "protocol": "TCP",
+          "name": "tcp"
+        }
+      ]
+    }
+  ]
+}

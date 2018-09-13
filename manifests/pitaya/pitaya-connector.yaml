@@ -1,0 +1,48 @@
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  labels:
+    app: pitaya-connector
+  name: pitaya-connector
+  namespace: default
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: pitaya-connector
+  template:
+    metadata:
+      labels:
+        app: pitaya-connector
+    spec:
+      containers:
+      - image: cscatolini/pitaya-maestro-demo:963179ac
+        imagePullPolicy: IfNotPresent
+        name: pitaya-connector
+        ports:
+        - containerPort: 3250
+          protocol: TCP
+        env:
+        - name: PITAYA_CLUSTER_RPC_CLIENT_NATS_CONNECT
+          value: nats://nats.default.svc.cluster.local:4222
+        - name: PITAYA_CLUSTER_RPC_SERVER_NATS_CONNECT
+          value: nats://nats.default.svc.cluster.local:4222
+        - name: PITAYA_CLUSTER_SD_ETCD_ENDPOINTS
+          value: etcd.default.svc.cluster.local:2379
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app: pitaya-connector
+  name: pitaya-connector
+  namespace: default
+spec:
+  ports:
+  - name: pitaya-connector
+    port: 3250
+    protocol: TCP
+    targetPort: 3250
+  selector:
+    app: pitaya-connector
+  type: NodePort
