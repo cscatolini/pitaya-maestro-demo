@@ -1,0 +1,41 @@
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  labels:
+    app: nats
+  name: nats
+  namespace: default
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: nats
+  template:
+    metadata:
+      labels:
+        app: nats
+    spec:
+      containers:
+      - image: nats:1.3.0-linux
+        imagePullPolicy: IfNotPresent
+        name: nats
+        ports:
+        - containerPort: 4222
+          protocol: TCP
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app: nats
+  name: nats
+  namespace: default
+spec:
+  ports:
+  - name: nats
+    port: 4222
+    protocol: TCP
+    targetPort: 4222
+  selector:
+    app: nats
+  type: ClusterIP

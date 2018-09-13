@@ -1,0 +1,18 @@
+version: '3'
+services:
+  nats:
+    image: nats
+    ports:
+      - 4222:4222
+  etcd:
+    image: appcelerator/etcd
+    ports:
+      - 2379:2379
+  pitaya-admin:
+    image: tfgco/pitaya-admin:5435941
+    ports:
+      - 8000:8000
+    environment:
+      - PITAYA_CLUSTER_RPC_CLIENT_NATS_CONNECT=nats://nats:4222
+      - PITAYA_CLUSTER_RPC_SERVER_NATS_CONNECT=nats://nats:4222
+      - PITAYA_CLUSTER_SD_ETCD_ENDPOINTS=etcd:2379
